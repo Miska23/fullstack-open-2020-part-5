@@ -15,7 +15,6 @@ const Form = (props) => (
         name="password"
         value={props.password}
         onChange={(event) => props.setPassword(event.target.value)} />
-
     </div>
     <button type="submit">login</button>
   </form>

@@ -16,7 +16,6 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-
   useEffect(() => {
     async function fetchData() {
       const response = await blogService.getAll()
@@ -25,14 +24,60 @@ const App = () => {
     fetchData()
   }, [])
 
-
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedInUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      blogService.setToken(user.token)
     }
   }, [])
+
+
+
+  const findNewestBlog = (blogArray) => {
+    const length = blogs.length
+    return blogArray
+      .filter((blog, index) =>  index === length - 1)
+      .map(blog => <Blog key={blog.id} blog={blog} />)
+  }
+
+  const getErrorMessage = () => {
+    return (
+      <div style={{ border: '2px solid red' }}>
+        <span style={{ fontSize: '1.5rem' }}>
+          {errorMessage}
+        </span>
+      </div>
+    )
+  }
+
+  //TODO: format styling (<Blog/> always renders a wrapping div for a single blog )
+  const getSuccessMessage = () => {
+    return (
+      <div style={{ border: '2px solid green' }}>
+        <span style={{ fontSize: '1.5rem' }}>
+          {successMessage}
+          {findNewestBlog(blogs)}
+        </span>
+      </div>
+    )
+  }
+
+  const handleAddNewBlog = async (event) => {
+    event.preventDefault()
+    const returnedBlog = await blogService.addNew({ title, author, url })
+    //! ruudulla näkyvät blogit päivittyvät vain koska stateen asetetaan uusi blogi,
+    //! lisäyksen jälkeen ei siis haeta uudelleen kaikkia blogeja
+    setBlogs(blogs.concat(returnedBlog))
+    setAuthor('')
+    setTitle('')
+    setUrl('')
+    setSuccessMessage('you added a new blog: ')
+    setTimeout(() => {
+      setSuccessMessage(false)
+    }, 5000)
+  }
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -53,14 +98,6 @@ const App = () => {
     }
   }
 
-  const handleAddNewBlog = () => {
-    blogService.addNew({ title, author, url })
-    setSuccessMessage('lisäsit uuden blogin')
-    setTimeout(() => {
-      setSuccessMessage(false)
-    }, 5000)
-  }
-
   const logUserOut = () => {
     window.localStorage.removeItem('loggedInuser')
     setUser('')
@@ -69,40 +106,22 @@ const App = () => {
   const renderAddNewBlogForm = () => {
     return (
       <BlogForm
+        author={author}
         handleAddNewBlog={handleAddNewBlog}
         setAuthor={setAuthor}
         setTitle={setTitle}
         setUrl={setUrl}
         title={title}
+        url={url}
       />
     )
   }
 
-  const findNewestBlog = (blogArray) => {
-    const length = blogs.length
-    console.log('length: ', length)
-    return blogArray
-      .filter((blog, index) =>  index === length - 1)
-      .map(blog => <Blog key={blog.id} blog={blog} />)
-  }
-
-  const getSuccessMessage = () => {
-    console.log('getSuccessMessage')
-    return (
-      <div style={{ border: '1px solid green' }}>
-        <span style={{ fontSize: '2rem' }}>
-          You added a new blog
-        </span>
-      </div>
-    )
-  }
-
   const renderLoggedInPage = () => {
-    console.log(findNewestBlog(blogs))
     return (
       <div>
         <p>{user.username} logged in </p>
-        {successMessage && <p>{successMessage}</p>}
+        {successMessage && getSuccessMessage()}
         {renderAddNewBlogForm()}
         <h2>blogs</h2>
         {blogs.map(blog =>
@@ -126,7 +145,7 @@ const App = () => {
           setUsername={setUsername}
           setPassword={setPassword}
         />
-        {errorMessage && <p>{errorMessage}</p>}
+        {errorMessage && getErrorMessage()}
       </div>
     )
   }

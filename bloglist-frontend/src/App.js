@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Blog from './components/Blog'
-import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
+import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
+
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-  const [author, setAuthor] = useState('')
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
-  const [title, setTitle] = useState('')
-  const [url, setUrl] = useState('')
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -24,6 +23,8 @@ const App = () => {
     fetchData()
   }, [])
 
+  const blogFormRef = useRef()
+
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedInUser')
     if (loggedUserJSON) {
@@ -32,8 +33,6 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
-
-
 
   const findNewestBlog = (blogArray) => {
     const length = blogs.length
@@ -64,15 +63,12 @@ const App = () => {
     )
   }
 
-  const handleAddNewBlog = async (event) => {
-    event.preventDefault()
-    const returnedBlog = await blogService.addNew({ title, author, url })
+  const createNewBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility()
+    const returnedBlog = await blogService.addNew(blogObject)
     //! ruudulla näkyvät blogit päivittyvät vain koska stateen asetetaan uusi blogi,
     //! lisäyksen jälkeen ei siis haeta uudelleen kaikkia blogeja
     setBlogs(blogs.concat(returnedBlog))
-    setAuthor('')
-    setTitle('')
-    setUrl('')
     setSuccessMessage('you added a new blog: ')
     setTimeout(() => {
       setSuccessMessage(false)
@@ -105,15 +101,12 @@ const App = () => {
 
   const renderAddNewBlogForm = () => {
     return (
-      <BlogForm
-        author={author}
-        handleAddNewBlog={handleAddNewBlog}
-        setAuthor={setAuthor}
-        setTitle={setTitle}
-        setUrl={setUrl}
-        title={title}
-        url={url}
-      />
+      <Togglable buttonLabel="Add a new blog" ref={blogFormRef}
+      >
+        <BlogForm
+          createNewBlog={createNewBlog}
+        />
+      </Togglable>
     )
   }
 
@@ -151,6 +144,7 @@ const App = () => {
   }
 
   if (!user) {
+    console.log('[Miska], blogFormRef: ', blogFormRef)
     return (
       renderLoginPage()
     )

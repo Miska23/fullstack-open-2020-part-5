@@ -23,4 +23,12 @@ const getAll = async () => {
   return request.data
 }
 
-export default { addNew, getAll, setToken }
+const updateOne = async () => {
+  //* lähetä PUTissa baseUrl ja blog. Autentikointia ei tarvita!
+  //* blog-olion tulee sisältää kaikki tietokantaan tallennetut tiedot (myös user-id joka viittaa blogin lisänneeseen käyttäjään)
+  //* ja blogin id joka haetaan frontissa statessa olevasta listasta
+  const request = await axios.put(baseUrl)
+  return request.data
+}
+
+export default { addNew, getAll, setToken, updateOne }

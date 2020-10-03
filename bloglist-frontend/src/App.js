@@ -34,6 +34,19 @@ const App = () => {
     }
   }, [])
 
+
+  const createNewBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility()
+    const returnedBlog = await blogService.addNew(blogObject)
+    //! ruudulla näkyvät blogit päivittyvät vain koska stateen asetetaan uusi blogi,
+    //! lisäyksen jälkeen ei siis haeta uudelleen kaikkia blogeja
+    setBlogs(blogs.concat(returnedBlog))
+    setSuccessMessage('you added a new blog: ')
+    setTimeout(() => {
+      setSuccessMessage(false)
+    }, 5000)
+  }
+
   const findNewestBlog = (blogArray) => {
     const length = blogs.length
     return blogArray
@@ -63,17 +76,6 @@ const App = () => {
     )
   }
 
-  const createNewBlog = async (blogObject) => {
-    blogFormRef.current.toggleVisibility()
-    const returnedBlog = await blogService.addNew(blogObject)
-    //! ruudulla näkyvät blogit päivittyvät vain koska stateen asetetaan uusi blogi,
-    //! lisäyksen jälkeen ei siis haeta uudelleen kaikkia blogeja
-    setBlogs(blogs.concat(returnedBlog))
-    setSuccessMessage('you added a new blog: ')
-    setTimeout(() => {
-      setSuccessMessage(false)
-    }, 5000)
-  }
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -101,7 +103,9 @@ const App = () => {
 
   const renderAddNewBlogForm = () => {
     return (
-      <Togglable buttonLabel="Add a new blog" ref={blogFormRef}
+      <Togglable
+        buttonLabel="Add a new blog"
+        ref={blogFormRef}
       >
         <BlogForm
           createNewBlog={createNewBlog}
@@ -110,16 +114,27 @@ const App = () => {
     )
   }
 
+  const renderBlogList = (blogs) => {
+    return (
+      <>
+        <h2>blogs</h2>
+        {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
+      </>
+    )
+
+  }
+
   const renderLoggedInPage = () => {
     return (
       <div>
         <p>{user.username} logged in </p>
         {successMessage && getSuccessMessage()}
         {renderAddNewBlogForm()}
-        <h2>blogs</h2>
-        {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
-        )}
+        {/* Lisää yksittäiselle blogille nappi, jonka avulla voi kontrolloida
+        näytetäänkö kaikki blogiin liittyvät tiedot.
+        Klikkaamalla nappia sen täydelliset tiedot aukeavat. */
+        }
+        {renderBlogList(blogs)}
         <button onClick={logUserOut}>logout</button>
       </div>
     )
@@ -143,6 +158,12 @@ const App = () => {
     )
   }
 
+  const updateExistingBlog = async (blogObject) => {
+    const updatedReturnedBlog = await blogService.updateOne(blogObject)
+    //* state tulee päivittää päivitysoperaation onnistuttua jota liket näkyvä ruudulla
+    // setBlogs(blogs.concat(returnedBlog))
+  }
+
   if (!user) {
     console.log('[Miska], blogFormRef: ', blogFormRef)
     return (
@@ -151,6 +172,7 @@ const App = () => {
   } else {
     return (
       renderLoggedInPage()
+
     )
   }
 }

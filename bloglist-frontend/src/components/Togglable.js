@@ -11,13 +11,11 @@ const Togglable = React.forwardRef((props, ref) => {
   }
 
   useImperativeHandle(ref, () => {
-    console.log('[Miska], ref: ', ref)
     return {
       toggleVisibility
     }
   })
 
-  console.log('[Miska], props.ref: ', props.ref)
   return (
     <div>
       <div style={hideWhenVisible}>

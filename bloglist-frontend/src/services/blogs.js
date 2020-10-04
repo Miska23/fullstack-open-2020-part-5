@@ -18,13 +18,13 @@ const addNew = async (blog) => {
   return request.data
 }
 
-const deleteOne = async (blog, id) => {
+const deleteOne = async (id) => {
 
   const config = {
     headers: { Authorization: token }
   }
-
-  const request = await axios.delete(`${baseUrl}/${id}`, blog, config)
+  const request = await axios.delete(`${baseUrl}/${id}`, config)
+  console.log('[Miska], request: ', request)
   return request.data
 }
 

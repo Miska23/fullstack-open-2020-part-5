@@ -48,11 +48,13 @@ const App = () => {
   }
 
   const deleteBlog = async (idToDelete) => {
+    console.log('[Miska], idToDelete: ', idToDelete)
     const blogToDelete = blogs.find(blog => blog.id === idToDelete)
+    console.log('[Miska], blogToDelete: ', blogToDelete)
     if (blogToDelete.user.username === user.username) {
       const ok = window.confirm(`Delete blog: ${blogToDelete.title}?`)
       if (ok) {
-        blogService.deleteOne(blogToDelete)
+        await blogService.deleteOne(idToDelete)
         setBlogs(blogs.filter(blog => blog.id !== blogToDelete.id))
       } else {
         return
@@ -131,7 +133,7 @@ const App = () => {
         <h2>blogs</h2>
         {blogs
           .sort((a, b ) => b.likes - a.likes)
-          .map(blog => <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} update={updateExistingBlog} />)}
+          .map(blog => <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} update={updateExistingBlog} username={user.username}/>)}
       </>
     )
   }

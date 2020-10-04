@@ -1,12 +1,9 @@
 import React, { useState } from 'react'
 
-const Blog = ({ blog, update }) => {
+const Blog = ({ blog, deleteBlog, update }) => {
 
   const [expandedView, setExpandedView] = useState(false)
 
-  /*   <button key={blog.id} onClick={() => setExpandedView(!expandedView)} >{expandedView ? 'hide' : 'view'} </button>
-  <Blog blog={blog} expandedView={expandedView}/>
- */
   let blogs
   if (expandedView) {
     blogs = (
@@ -24,6 +21,10 @@ const Blog = ({ blog, update }) => {
           <li>
             Likes: {blog.likes}
             <button onClick={() => update(blog.id)}>like</button>
+          </li>
+          <li>
+            {{/* TODO: show remove button only for creator of the blog */}}
+            <button onClick={() => deleteBlog(blog.id)}>remove</button>
           </li>
         </ul>
       </div>

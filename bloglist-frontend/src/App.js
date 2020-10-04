@@ -47,6 +47,21 @@ const App = () => {
     }, 5000)
   }
 
+  const deleteBlog = async (idToDelete) => {
+    const blogToDelete = blogs.find(blog => blog.id === idToDelete)
+    if (blogToDelete.user.username === user.username) {
+      const ok = window.confirm(`Delete blog: ${blogToDelete.title}?`)
+      if (ok) {
+        blogService.deleteOne(blogToDelete)
+        setBlogs(blogs.filter(blog => blog.id !== blogToDelete.id))
+      } else {
+        return
+      }
+    } else {
+      window.alert('Only the creator of the blog can delete it')
+    }
+  }
+
   const findNewestBlog = (blogArray) => {
     return blogArray.filter((blog, index) =>  index === blogs.length - 1)
   }
@@ -72,8 +87,6 @@ const App = () => {
       </div>
     )
   }
-
-
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -116,10 +129,11 @@ const App = () => {
     return (
       <>
         <h2>blogs</h2>
-        {blogs.map(blog => <Blog key={blog.id} blog={blog} update={updateExistingBlog} />)}
+        {blogs
+          .sort((a, b ) => b.likes - a.likes)
+          .map(blog => <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} update={updateExistingBlog} />)}
       </>
     )
-
   }
 
   const renderLoggedInPage = () => {
@@ -129,10 +143,6 @@ const App = () => {
         <button onClick={logUserOut}>logout</button>
         {successMessage && getSuccessMessage()}
         {renderAddNewBlogForm()}
-        {/* Lisää yksittäiselle blogille nappi, jonka avulla voi kontrolloida
-        näytetäänkö kaikki blogiin liittyvät tiedot.
-        Klikkaamalla nappia sen täydelliset tiedot aukeavat. */
-        }
         {renderBlogList(blogs)}
       </div>
     )
@@ -157,9 +167,7 @@ const App = () => {
   }
 
   const updateExistingBlog = async (idToUpdate) => {
-    console.log('[Miska], blogId: ', idToUpdate)
     const blogToUpdate = blogs.find(blog => blog.id === idToUpdate)
-    console.log('[Miska], blogToUpdate: ', blogToUpdate)
     const newBlog = {
       author: blogToUpdate.author,
       likes: blogToUpdate.likes + 1,
@@ -167,9 +175,7 @@ const App = () => {
       url: blogToUpdate.url,
       user: blogToUpdate.user.id,
     }
-    console.log('[Miska], newBlog: ', newBlog)
     const returnedUpdatedBlog = await blogService.updateOne(newBlog, blogToUpdate.id)
-    console.log('[Miska], returnedUpdatedBlog: ', returnedUpdatedBlog)
     setBlogs(blogs.map(blog => blog.id !== blogToUpdate.id ? blog : returnedUpdatedBlog))
     //* state tulee päivittää päivitysoperaation onnistuttua jota liket näkyvä ruudulla
     // setBlogs(blogs.concat(returnedBlog))

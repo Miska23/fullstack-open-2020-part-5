@@ -48,10 +48,7 @@ const App = () => {
   }
 
   const findNewestBlog = (blogArray) => {
-    const length = blogs.length
-    return blogArray
-      .filter((blog, index) =>  index === length - 1)
-      .map(blog => <Blog key={blog.id} blog={blog} />)
+    return blogArray.filter((blog, index) =>  index === blogs.length - 1)
   }
 
   const getErrorMessage = () => {
@@ -67,14 +64,15 @@ const App = () => {
   //TODO: format styling (<Blog/> always renders a wrapping div for a single blog )
   const getSuccessMessage = () => {
     return (
-      <div style={{ border: '2px solid green' }}>
-        <span style={{ fontSize: '1.5rem' }}>
+      <div style={{ border: '2px solid green', fontSize: '1.5rem' }}>
+        <span>
           {successMessage}
-          {findNewestBlog(blogs)}
         </span>
+        {findNewestBlog(blogs).map(blog => <span key={blog.id}>{blog.title} {blog.author}</span>)}
       </div>
     )
   }
+
 
 
   const handleLogin = async (event) => {
@@ -118,7 +116,7 @@ const App = () => {
     return (
       <>
         <h2>blogs</h2>
-        {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
+        {blogs.map(blog => <Blog key={blog.id} blog={blog} update={updateExistingBlog} />)}
       </>
     )
 
@@ -128,6 +126,7 @@ const App = () => {
     return (
       <div>
         <p>{user.username} logged in </p>
+        <button onClick={logUserOut}>logout</button>
         {successMessage && getSuccessMessage()}
         {renderAddNewBlogForm()}
         {/* Lisää yksittäiselle blogille nappi, jonka avulla voi kontrolloida
@@ -135,7 +134,6 @@ const App = () => {
         Klikkaamalla nappia sen täydelliset tiedot aukeavat. */
         }
         {renderBlogList(blogs)}
-        <button onClick={logUserOut}>logout</button>
       </div>
     )
   }
@@ -158,14 +156,26 @@ const App = () => {
     )
   }
 
-  const updateExistingBlog = async (blogObject) => {
-    const updatedReturnedBlog = await blogService.updateOne(blogObject)
+  const updateExistingBlog = async (idToUpdate) => {
+    console.log('[Miska], blogId: ', idToUpdate)
+    const blogToUpdate = blogs.find(blog => blog.id === idToUpdate)
+    console.log('[Miska], blogToUpdate: ', blogToUpdate)
+    const newBlog = {
+      author: blogToUpdate.author,
+      likes: blogToUpdate.likes + 1,
+      title: blogToUpdate.title,
+      url: blogToUpdate.url,
+      user: blogToUpdate.user.id,
+    }
+    console.log('[Miska], newBlog: ', newBlog)
+    const returnedUpdatedBlog = await blogService.updateOne(newBlog, blogToUpdate.id)
+    console.log('[Miska], returnedUpdatedBlog: ', returnedUpdatedBlog)
+    setBlogs(blogs.map(blog => blog.id !== blogToUpdate.id ? blog : returnedUpdatedBlog))
     //* state tulee päivittää päivitysoperaation onnistuttua jota liket näkyvä ruudulla
     // setBlogs(blogs.concat(returnedBlog))
   }
 
   if (!user) {
-    console.log('[Miska], blogFormRef: ', blogFormRef)
     return (
       renderLoginPage()
     )

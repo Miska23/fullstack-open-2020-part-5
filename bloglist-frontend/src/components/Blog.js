@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, update }) => {
 
   const [expandedView, setExpandedView] = useState(false)
 
@@ -11,7 +11,21 @@ const Blog = ({ blog }) => {
   if (expandedView) {
     blogs = (
       <div>
-        {blog.title} {blog.author} {blog.url} Likes: {blog.likes}
+        <ul style={{ listStyle: 'none' }}>
+          <li>
+            {blog.title}
+          </li>
+          <li>
+            {blog.author}
+          </li>
+          <li>
+            {blog.url}
+          </li>
+          <li>
+            Likes: {blog.likes}
+            <button onClick={() => update(blog.id)}>like</button>
+          </li>
+        </ul>
       </div>
     )
   } else {

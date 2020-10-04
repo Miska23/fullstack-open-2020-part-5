@@ -23,11 +23,12 @@ const getAll = async () => {
   return request.data
 }
 
-const updateOne = async () => {
+const updateOne = async (blogObject, id) => {
   //* lähetä PUTissa baseUrl ja blog. Autentikointia ei tarvita!
   //* blog-olion tulee sisältää kaikki tietokantaan tallennetut tiedot (myös user-id joka viittaa blogin lisänneeseen käyttäjään)
   //* ja blogin id joka haetaan frontissa statessa olevasta listasta
-  const request = await axios.put(baseUrl)
+  const request = await axios.put(`${baseUrl}/${id}`, blogObject)
+  console.log('[Miska], request: ', request)
   return request.data
 }
 

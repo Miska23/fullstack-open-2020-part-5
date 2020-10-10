@@ -24,7 +24,6 @@ const deleteOne = async (id) => {
     headers: { Authorization: token }
   }
   const request = await axios.delete(`${baseUrl}/${id}`, config)
-  console.log('[Miska], request: ', request)
   return request.data
 }
 
@@ -34,11 +33,7 @@ const getAll = async () => {
 }
 
 const updateOne = async (blog, id) => {
-  //* lähetä PUTissa baseUrl ja blog. Autentikointia ei tarvita!
-  //* blog-olion tulee sisältää kaikki tietokantaan tallennetut tiedot (myös user-id joka viittaa blogin lisänneeseen käyttäjään)
-  //* ja blogin id joka haetaan frontissa statessa olevasta listasta
   const request = await axios.put(`${baseUrl}/${id}`, blog)
-  console.log('[Miska], request: ', request)
   return request.data
 }
 

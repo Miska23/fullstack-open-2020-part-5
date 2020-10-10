@@ -48,9 +48,7 @@ const App = () => {
   }
 
   const deleteBlog = async (idToDelete) => {
-    console.log('[Miska], idToDelete: ', idToDelete)
     const blogToDelete = blogs.find(blog => blog.id === idToDelete)
-    console.log('[Miska], blogToDelete: ', blogToDelete)
     if (blogToDelete.user.username === user.username) {
       const ok = window.confirm(`Delete blog: ${blogToDelete.title}?`)
       if (ok) {
@@ -179,8 +177,6 @@ const App = () => {
     }
     const returnedUpdatedBlog = await blogService.updateOne(newBlog, blogToUpdate.id)
     setBlogs(blogs.map(blog => blog.id !== blogToUpdate.id ? blog : returnedUpdatedBlog))
-    //* state tulee päivittää päivitysoperaation onnistuttua jota liket näkyvä ruudulla
-    // setBlogs(blogs.concat(returnedBlog))
   }
 
   if (!user) {

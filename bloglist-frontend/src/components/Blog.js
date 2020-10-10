@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 
+import PropTypes from 'prop-types'
+
 const Blog = ({ blog, deleteBlog, update, username }) => {
 
   const [expandedView, setExpandedView] = useState(false)
@@ -43,6 +45,10 @@ const Blog = ({ blog, deleteBlog, update, username }) => {
       {blogs}
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired
 }
 
 

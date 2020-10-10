@@ -38,8 +38,6 @@ const App = () => {
   const createNewBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility()
     const returnedBlog = await blogService.addNew(blogObject)
-    //! ruudulla näkyvät blogit päivittyvät vain koska stateen asetetaan uusi blogi,
-    //! lisäyksen jälkeen ei siis haeta uudelleen kaikkia blogeja
     setBlogs(blogs.concat(returnedBlog))
     setSuccessMessage('you added a new blog: ')
     setTimeout(() => {

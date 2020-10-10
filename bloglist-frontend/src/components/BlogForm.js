@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
+
+
 
 const BlogForm = (props) => {
 
@@ -42,4 +45,10 @@ const BlogForm = (props) => {
   )
 }
 
+BlogForm.propTypes = {
+  createNewBlog: PropTypes.func.isRequired
+}
+
 export default BlogForm
+
+

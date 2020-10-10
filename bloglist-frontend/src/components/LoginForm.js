@@ -1,5 +1,8 @@
 import React from 'react'
-const Form = (props) => (
+
+import PropTypes from 'prop-types'
+
+const LoginForm = (props) => (
 
   <form onSubmit={props.handleLogin}>
     <div>Username
@@ -20,4 +23,8 @@ const Form = (props) => (
   </form>
 )
 
-export default Form
+LoginForm.propTypes = {
+  handleLogin: PropTypes.func.isRequired
+}
+
+export default LoginForm

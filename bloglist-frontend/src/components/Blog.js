@@ -10,7 +10,7 @@ const Blog = ({ blog, deleteBlog, update, username }) => {
   let blogs
   if (expandedView) {
     blogs = (
-      <div>
+      <div className="blog-expanded">
         <ul style={{ listStyle: 'none' }}>
           <li>
             {blog.title}
@@ -23,7 +23,7 @@ const Blog = ({ blog, deleteBlog, update, username }) => {
           </li>
           <li>
             Likes: {blog.likes}
-            <button onClick={() => update(blog.id)}>like</button>
+            <button className="like-button" onClick={() => update(blog.id)}>like</button>
           </li>
           <li>
             {blog.user.username === username && <button onClick={() => deleteBlog(blog.id)}>remove</button>}
@@ -33,7 +33,7 @@ const Blog = ({ blog, deleteBlog, update, username }) => {
     )
   } else {
     blogs = (
-      <div>
+      <div className="blog">
         {blog.title} {blog.author}
       </div>
     )
@@ -41,7 +41,7 @@ const Blog = ({ blog, deleteBlog, update, username }) => {
 
   return (
     <div>
-      <button key={blog.id} onClick={() => setExpandedView(!expandedView)} >{expandedView ? 'hide' : 'view'} </button>
+      <button className="expand-button" key={blog.id} onClick={() => setExpandedView(!expandedView)} >{expandedView ? 'hide' : 'view'} </button>
       {blogs}
     </div>
   )

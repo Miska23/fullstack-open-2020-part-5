@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 const LoginForm = (props) => (
 
-  <form onSubmit={props.handleLogin}>
+  <form id="form-login" onSubmit={props.handleLogin}>
     <div>Username
       <input
         type="text"

@@ -27,3 +27,4 @@ yarn-error.log*
 
 bloglist-frontend/.vscode
 bloglist-frontend/.vscode/launch.json
+bloglist-backend/.vscode/launch.json

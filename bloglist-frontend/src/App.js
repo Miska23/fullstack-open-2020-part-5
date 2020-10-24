@@ -138,7 +138,7 @@ const App = () => {
     return (
       <div>
         <p>{user.username} logged in </p>
-        <button onClick={logUserOut}>logout</button>
+        <button className="logout-button" onClick={logUserOut}>logout</button>
         {successMessage && getSuccessMessage()}
         {renderAddNewBlogForm()}
         {renderBlogList(blogs)}

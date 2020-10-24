@@ -21,12 +21,12 @@ const Blog = ({ blog, deleteBlog, update, username }) => {
           <li>
             {blog.url}
           </li>
-          <li>
+          <li className="likes-container">
             Likes: {blog.likes}
             <button className="like-button" onClick={() => update(blog.id)}>like</button>
           </li>
           <li>
-            {blog.user.username === username && <button onClick={() => deleteBlog(blog.id)}>remove</button>}
+            {blog.user.username === username && <button className="delete-button" onClick={() => deleteBlog(blog.id)}>remove</button>}
           </li>
         </ul>
       </div>

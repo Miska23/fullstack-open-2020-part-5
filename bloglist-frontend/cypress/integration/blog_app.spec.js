@@ -1,14 +1,10 @@
 describe('Blog app', function() {
 
+  //* reset and create a new user
   beforeEach(function() {
     cy.request('POST', 'http://localhost:3001/api/testing/reset')
-    const user = {
-      name: 'Miska Linden',
-      username: 'Miska23',
-      password: 'miska_scrt'
-    }
-    cy.request('POST', 'http://localhost:3001/api/users/', user)
-    cy.visit('http://localhost:3000')
+    cy.createUser({ name: 'Miska Linden', username: 'Miska23', password: 'miska_scrt' })
+    cy.createUser({ name: 'Another User', username: 'User99', password: 'default' })
   })
 
   describe('Before user logs in ', function() {
@@ -22,21 +18,9 @@ describe('Blog app', function() {
     })
   })
 
-  describe.only('Creating a new blog', function() {
+  describe('Logging in via UI', function() {
 
-    beforeEach(function() {
-      cy.login({ username: 'Miska23', password: 'miska_scrt' })
-    })
-    beforeEach(function() {
-      cy.createBlog({
-        author: 'Cypress master',
-        title: 'Learn to test with cypress',
-        url: 'www.cypressmasters.com'
-      })
-    })
-
-
-    /*     it('succeeds with valid credentials', function() {
+    it('succeeds with valid credentials', function() {
       cy.get('input[name="username"]')
         .type('Miska23')
       cy.get('input[name="password"]')
@@ -44,9 +28,9 @@ describe('Blog app', function() {
       cy.get('button')
         .click()
       cy.contains('Miska23 logged in').should('be.visible')
-    }) */
+    })
 
-    /* it('fails with invalid credentials', function() {
+    it('fails with invalid credentials', function() {
       cy.get('input[name="username"]')
         .type('Miska23')
       cy.get('input[name="password"]')
@@ -58,10 +42,19 @@ describe('Blog app', function() {
         .parent('div')
         .should('have.css', 'border', '2px solid rgb(255, 0, 0)')
       cy.contains('Miska23 logged in')
-        .should('not.exist')s
-    }) */
+        .should('not.exist')
+    })
 
-    /*     it('A blog can be created', function() {
+  })
+
+  describe('After logging in via backend', function() {
+
+    //* login
+    beforeEach(function() {
+      cy.login({ username: 'Miska23', password: 'miska_scrt' })
+    })
+
+    it('A new blog can be created via UI', function() {
       cy.contains('Add a new blog')
         .click()
       cy.get('#input-title')
@@ -74,7 +67,25 @@ describe('Blog app', function() {
         .click()
       cy.get('.blog')
         .should('contain','Learn to test with cypress Cypress master')
-    }) */
+    })
+  })
+
+  describe('After creating a new blog via backend', function() {
+
+    //* login
+    beforeEach(function() {
+      cy.login({ username: 'Miska23', password: 'miska_scrt' })
+    })
+
+    //* create a new blog
+    beforeEach(function() {
+      cy.createBlog({
+        author: 'Cypress master',
+        title: 'Learn to test with cypress',
+        url: 'www.cypressmasters.com'
+      })
+    })
+
     it('New blog can be viewed', function() {
       cy.get('.blog')
         .should('contain','Learn to test with cypress Cypress master')
@@ -83,10 +94,120 @@ describe('Blog app', function() {
     it('New blog can be given a like', function() {
       cy.get('.expand-button')
         .click()
-      //TODO: test liking in backend and read likes programmatically
       cy.get('.like-button')
         .click()
       cy.contains('Likes: 1')
+    })
+
+    it('New blog can be deleted by the user who created it', function() {
+      cy.get('.expand-button')
+        .click()
+      cy.get('.delete-button')
+        .click()
+      cy.get('html').should('not.contain', 'Learn to test with cypress Cypress master')
+    })
+  })
+
+  describe('Deleting a blog created by another user', function() {
+
+    //* login with user that create a new blog
+    beforeEach(function() {
+      cy.login({ username: 'Miska23', password: 'miska_scrt' })
+    })
+
+    //* create a new blog
+    beforeEach(function() {
+      cy.createBlog({
+        author: 'Cypress master',
+        title: 'Learn to test with cypress',
+        url: 'www.cypressmasters.com'
+      })
+    })
+
+    //* logout with user that created the new blog
+    beforeEach(function() {
+      cy.logout()
+    })
+
+    //* login with another user
+    beforeEach(function() {
+      cy.login({ username: 'User99', password: 'default' })
+    })
+
+    it('Does not succeed', function() {
+      cy.get('.expand-button')
+        .click()
+      cy.get('html').should('not.contain', '.delete-button')
+    })
+  })
+
+  describe.only('After creating multiple blogs via backend and giving them likes via UI', function() {
+
+    //* login
+    beforeEach(function() {
+      cy.login({ username: 'Miska23', password: 'miska_scrt' })
+    })
+
+    //* create new blogs
+    beforeEach(function() {
+      cy.createBlog({
+        author: 'Cypress master',
+        title: 'Learn to test with cypress',
+        url: 'www.cypressmasters.com'
+      })
+      cy.createBlog({
+        author: 'Mocha master',
+        title: 'Learn to test with mocha',
+        url: 'www.mochamasters.com'
+      })
+      cy.createBlog({
+        author: 'Selenium master',
+        title: 'Learn to test with selenium',
+        url: 'www.seleniummasters.com'
+      })
+    })
+
+    //* give likes to blogs
+    beforeEach(function() {
+      cy.addLikeInUI('Learn to test with cypress', 2)
+      cy.addLikeInUI('Learn to test with mocha', 3)
+      cy.addLikeInUI('Learn to test with selenium', 1)
+    })
+
+    it.skip('Blogs have right amount of likes', function() {
+      cy.contains('Learn to test with cypress Cypress master')
+        .parent()
+        .find('.expand-button')
+        .click()
+      cy.contains('Likes: 2')
+      cy.contains('Learn to test with mocha Mocha master')
+        .parent()
+        .find('.expand-button')
+        .click()
+      cy.contains('Likes: 3')
+      cy.contains('Learn to test with selenium Selenium master')
+        .parent()
+        .find('.expand-button')
+        .click()
+      cy.contains('Likes: 1')
+    })
+    it('Blogs are ordered on the basis of number of likes', function() {
+      cy.get('.expand-button')
+        .click({ multiple: true })
+      cy.get('.blog-expanded').then(($blogs) => {
+        cy.wrap($blogs).get('.likes-container').then(($likeTexts) => {
+          Array.from($likeTexts).forEach(($likeText) => console.log($likeText.innerText.substring(7,8)))
+        })
+        /* const sorted = Array.from($blogs).sort(function(a, b) {
+          return b.likes - a.likes
+        })
+        console.log('sorted: ', sorted) */
+        expect($blogs[0]).to.contain('Likes: 3')
+        expect($blogs[1]).to.contain('Likes: 2')
+        expect($blogs[2]).to.contain('Likes: 1')
+      })
+
+
     })
   })
 })

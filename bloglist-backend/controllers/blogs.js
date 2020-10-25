@@ -30,7 +30,6 @@ router.delete('/:id', async (request, response) => {
   response.status(204).end()
 })
 
-//TODO: why logs don't get printed inside this route?
 router.put('/:id', async (request, response) => {
   const blog = request.body
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })

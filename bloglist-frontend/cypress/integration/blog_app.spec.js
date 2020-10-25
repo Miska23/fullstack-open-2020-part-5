@@ -1,6 +1,6 @@
 describe('Blog app', function() {
 
-  //* reset and create a new user
+  //* reset and create two users
   beforeEach(function() {
     cy.request('POST', 'http://localhost:3001/api/testing/reset')
     cy.createUser({ name: 'Miska Linden', username: 'Miska23', password: 'miska_scrt' })
@@ -48,7 +48,6 @@ describe('Blog app', function() {
   })
 
   describe('After logging in via backend', function() {
-
     //* login
     beforeEach(function() {
       cy.login({ username: 'Miska23', password: 'miska_scrt' })
@@ -70,7 +69,7 @@ describe('Blog app', function() {
     })
   })
 
-  describe('After creating a new blog via backend', function() {
+  describe.only('After creating a new blog via backend', function() {
 
     //* login
     beforeEach(function() {
@@ -108,14 +107,14 @@ describe('Blog app', function() {
     })
   })
 
-  describe('Deleting a blog created by another user', function() {
+  describe('Trying to delete a blog created by another user', function() {
 
-    //* login with user that create a new blog
+    //* login with first user
     beforeEach(function() {
       cy.login({ username: 'Miska23', password: 'miska_scrt' })
     })
 
-    //* create a new blog
+    //* create a new blog with first user
     beforeEach(function() {
       cy.createBlog({
         author: 'Cypress master',
@@ -124,12 +123,12 @@ describe('Blog app', function() {
       })
     })
 
-    //* logout with user that created the new blog
+    //* logout with first user
     beforeEach(function() {
       cy.logout()
     })
 
-    //* login with another user
+    //* login with second user
     beforeEach(function() {
       cy.login({ username: 'User99', password: 'default' })
     })
@@ -141,7 +140,7 @@ describe('Blog app', function() {
     })
   })
 
-  describe.only('After creating multiple blogs via backend and giving them likes via UI', function() {
+  describe('After creating multiple blogs via backend and giving them likes via UI', function() {
 
     //* login
     beforeEach(function() {
@@ -174,40 +173,14 @@ describe('Blog app', function() {
       cy.addLikeInUI('Learn to test with selenium', 1)
     })
 
-    it.skip('Blogs have right amount of likes', function() {
-      cy.contains('Learn to test with cypress Cypress master')
-        .parent()
-        .find('.expand-button')
-        .click()
-      cy.contains('Likes: 2')
-      cy.contains('Learn to test with mocha Mocha master')
-        .parent()
-        .find('.expand-button')
-        .click()
-      cy.contains('Likes: 3')
-      cy.contains('Learn to test with selenium Selenium master')
-        .parent()
-        .find('.expand-button')
-        .click()
-      cy.contains('Likes: 1')
-    })
     it('Blogs are ordered on the basis of number of likes', function() {
       cy.get('.expand-button')
         .click({ multiple: true })
       cy.get('.blog-expanded').then(($blogs) => {
-        cy.wrap($blogs).get('.likes-container').then(($likeTexts) => {
-          Array.from($likeTexts).forEach(($likeText) => console.log($likeText.innerText.substring(7,8)))
-        })
-        /* const sorted = Array.from($blogs).sort(function(a, b) {
-          return b.likes - a.likes
-        })
-        console.log('sorted: ', sorted) */
         expect($blogs[0]).to.contain('Likes: 3')
         expect($blogs[1]).to.contain('Likes: 2')
         expect($blogs[2]).to.contain('Likes: 1')
       })
-
-
     })
   })
 })

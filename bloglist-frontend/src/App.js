@@ -66,15 +66,14 @@ const App = () => {
 
   const getErrorMessage = () => {
     return (
-      <div style={{ border: '2px solid red' }}>
-        <span style={{ fontSize: '1.5rem' }}>
+      <div style={{ border: '2px solid red', fontSize: '1.5rem' }}>
+        <span >
           {errorMessage}
         </span>
       </div>
     )
   }
 
-  //TODO: format styling (<Blog/> always renders a wrapping div for a single blog )
   const getSuccessMessage = () => {
     return (
       <div style={{ border: '2px solid green', fontSize: '1.5rem' }}>
